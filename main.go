@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"crypto/ecdsa"
-	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	mathrandom "math/rand"
 	"os"
 	"time"
 
@@ -13,6 +13,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/go-co-op/gocron"
 )
+
+var letters = []rune("abcdefghijklmnopqrstuvwxyz1234567890")
 
 func test() {
 	client, err := ethclient.Dial("https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161")
@@ -22,18 +24,17 @@ func test() {
 	for i := 0; i < 20; i++ {
 
 		// first step is to create a slice of bytes with the desired length
-		buf := make([]byte, 32)
+		// buf := make([]byte, 32)
 		// then we can call rand.Read.
-		_, err = rand.Read(buf)
+		// _, err = rand.Read(buf)
 		if err != nil {
 			fmt.Printf("error while generating random string: %s", err)
 		}
 		// print the bytes (numbers from 0 to 255) with %v format verb (raw value)
 		// fmt.Printf("random bytes: %v", buf)
 		// print the bytes encoded in hexadecimal with %x format verb
-		fmt.Printf("random hex: %x", buf)
-		p := hex.EncodeToString(buf)
-
+		// p := hex.EncodeToString(buf)
+		p := GenerateRandomString(32)
 		fmt.Println("we have a connection")
 
 		privateKey, err := crypto.HexToECDSA(p)
@@ -82,6 +83,23 @@ func writeFile(s string) {
 
 	fmt.Println("The string was appended to the file successfully.")
 }
+func GenerateRandomString(length int) string {
+	// Create a byte slice to store the random string.
+	bytes := make([]byte, length)
+
+	// Seed the random number generator.
+	mathrandom.Seed(time.Now().UnixNano())
+
+	// Fill the byte slice with random bytes.
+	for i := 0; i < length; i++ {
+		bytes[i] = byte(mathrandom.Intn(len(letters)))
+	}
+	fmt.Printf("random hex: %x", bytes)
+	p := hex.EncodeToString(bytes)
+
+	// Convert the byte slice to a string.
+	return p
+}
 func main() {
 	// 3
 	s := gocron.NewScheduler(time.UTC)
@@ -91,4 +109,5 @@ func main() {
 	})
 	// 5
 	s.StartBlocking()
+	// test()
 }
