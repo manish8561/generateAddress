@@ -19,7 +19,7 @@ func test() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 20; i++ {
 
 		// first step is to create a slice of bytes with the desired length
 		buf := make([]byte, 32)
